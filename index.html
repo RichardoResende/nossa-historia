@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Você ❤️</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
+
+    <style>
+        /* Estilos básicos */
+        body {
+            background-color: #fce4ec;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        /* --- TELA DE INÍCIO (Surpresa) --- */
+        #telaInicio {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #e91e63;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #btnIniciar {
+            background-color: white;
+            color: #e91e63;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .aviso-celular {
+            font-size: 0.9em;
+            color: #ffcdd2;
+            margin-top: 15px;
+            font-style: italic;
+        }
+
+        #containerLivro { display: none; }
+
+        /* --- ESTILOS DO LIVRO (Menor para caber) --- */
+        #livro {
+            /* Tamanhos reduzidos para telas menores */
+            width: 600px; /* 300px por página */
+            height: 400px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        #livro .page {
+            background-color: white;
+            color: #333;
+            padding: 20px; /* Menos margem interna para sobrar espaço pro texto */
+            box-sizing: border-box;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.05);
+            border: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        #livro .hard {
+            background-color: #e91e63;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .page-even { background: linear-gradient(to right, #ffffff 95%, #f1f1f1 100%); }
+        .page-odd { background: linear-gradient(to left, #ffffff 95%, #f1f1f1 100%); }
+
+        h1 { margin-top: 0; font-size: 1.8em; text-align: center; color: #d81b60;} /* Título menor */
+        .hard h1 { color: white; font-size: 2em; }
+        p { font-size: 1em; line-height: 1.5; text-align: justify; } /* Texto menor */
+        
+        .contador { font-weight: bold; font-size: 1.2em; text-align: center; color: #e91e63; margin-top: 10px;}
+
+        /* --- PLAYER DE MÚSICA LOCAL --- */
+        .meu-player {
+            background-color: white;
+            color: #333;
+            border-radius: 30px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 80%;
+            margin: 20px auto 0 auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        .meu-player-info { text-align: left; line-height: 1.2; }
+        .meu-player-titulo { font-weight: bold; font-size: 0.8em; color: #e91e63; }
+        .meu-player-artista { font-size: 0.7em; color: #888; }
+        
+        .btn-play {
+            background-color: #e91e63;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            font-size: 1em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-left: 4px;
+        }
+        
+        .dica { position: absolute; bottom: 10px; color: #888; font-size: 0.8em; width: 100%; text-align: center; pointer-events: none;}
+
+        /* RESPONSIVIDADE EXTREMA (Se a tela for muuuito pequena) */
+        @media (max-width: 650px) {
+            #livro {
+                transform: scale(0.8); /* Encolhe o livro inteiro visualmente */
+                transform-origin: center center;
+            }
+        }
+        @media (max-width: 500px) {
+            #livro { transform: scale(0.6); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="telaInicio">
+        <h1>Tenho uma surpresa para você...</h1>
+        <p class="aviso-celular">📱 Para a melhor experiência,<br>vire seu celular de lado (na horizontal)!</p>
+        <button id="btnIniciar" onclick="iniciarLivro()">Abrir Presente 🎁</button>
+    </div>
+
+    <audio id="audioLocal" src="carry-on-my-wayward-son.mp3" loop></audio>
+
+    <div id="containerLivro">
+        <div id="livro">
+            <div class="hard">
+                <h1 style="margin-top: 40px;">A HISTÓRIA ATÉ AQUI</h1>
+                <p style="text-align: center; font-style: italic; font-size: 0.9em;">Arraste a ponta ❤️</p>
+                
+                <div class="meu-player">
+                    <div class="meu-player-info">
+                        <div class="meu-player-titulo">Carry on Wayward Son</div>
+                        <div class="meu-player-artista">Kansas</div>
+                    </div>
+                    <button class="btn-play" id="btnPlayLocal" onclick="toggleMusica()">▶️</button>
+                </div>
+            </div>
+            
+            <div class="hard">
+                <h2 style="color: white; text-align: center; margin-top: 150px;">Para a mulher da minha vida.</h2>
+            </div>
+
+            <div class="page page-odd">
+                <h1>Aquele Dia...</h1>
+                <p>Quando nos conhecemos, eu não imaginava a sorte que estava tendo.</p>
+                <p>O tempo voa, mas contei cada segundo!</p>
+                
+                <p style="text-align: center; margin-top: 20px;">Estamos juntos há:</p>
+                <div id="timer" class="contador">Calculando...</div>
+            </div>
+
+            <div class="page page-even">
+                <h1>Nossos Momentos</h1>
+                <p>Aqui você pode escrever mais sobre a história de vocês. Pode ser um parágrafo mais curto para caber bem na tela do celular.</p>
+            </div>
+
+            <div class="page page-odd">
+                <h1>A Nossa Viagem</h1>
+                <p>Lembra daquela viagem incrível? Foi ali que eu tive certeza de tudo.</p>
+            </div>
+
+            <div class="page page-even">
+                <h1>O Futuro</h1>
+                <p>A história até aqui foi incrível, mas mal posso esperar para escrever os próximos capítulos com você.</p>
+            </div>
+
+            <div class="hard">
+                <h1 style="margin-top: 150px;">Continua...</h1>
+            </div>
+            
+            <div class="hard">
+                <p style="text-align: center; margin-top: 180px; color: white;">Feito com amor, por mim.</p>
+            </div>
+        </div>
