@@ -8,26 +8,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
 
     <style>
-        /* Estilos básicos */
         body {
             background-color: #fce4ec;
             display: flex;
+            flex-direction: column; 
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
         }
 
-        /* --- TELA DE INÍCIO (Surpresa) --- */
+        /* --- TELA DE INÍCIO (Lilás e Animada) --- */
         #telaInicio {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #e91e63;
+            background-color: #D8BFD8; /* Cor Lilás */
             color: white;
             display: flex;
             flex-direction: column;
@@ -38,32 +38,55 @@
             padding: 20px;
         }
 
+        #telaInicio h1 {
+            font-size: 1.8em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            max-width: 80%;
+            margin-bottom: 10px;
+        }
+
+        /* Botão do Presente Pulsante */
         #btnIniciar {
-            background-color: white;
-            color: #e91e63;
+            background: white;
             border: none;
-            padding: 15px 30px;
-            font-size: 1.2em;
-            font-weight: bold;
-            border-radius: 30px;
+            width: 100px;
+            height: 100px;
+            font-size: 4em;
+            border-radius: 50%;
             cursor: pointer;
             margin-top: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transition: all 0.2s ease;
+            animation: pulse 1.5s infinite ease-in-out;
         }
 
+        /* Efeito de Brilho ao Clicar */
+        #btnIniciar:active {
+            box-shadow: 0 0 60px 30px rgba(255, 255, 255, 0.9);
+            transform: scale(1.2);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Texto de Aviso Atualizado */
         .aviso-celular {
             font-size: 0.9em;
-            color: #ffcdd2;
-            margin-top: 15px;
+            color: #ffffff;
+            margin-top: 25px;
             font-style: italic;
+            opacity: 0.9;
         }
 
-        #containerLivro { display: none; }
-
-        /* --- ESTILOS DO LIVRO (Menor para caber) --- */
+        /* --- LIVRO --- */
         #livro {
-            /* Tamanhos reduzidos para telas menores */
-            width: 600px; /* 300px por página */
+            width: 600px;
             height: 400px;
             box-shadow: 0 0 20px rgba(0,0,0,0.2);
             position: relative;
@@ -72,7 +95,7 @@
         #livro .page {
             background-color: white;
             color: #333;
-            padding: 20px; /* Menos margem interna para sobrar espaço pro texto */
+            padding: 10px;
             box-sizing: border-box;
             box-shadow: inset 0 0 30px rgba(0,0,0,0.05);
             border: 1px solid #ddd;
@@ -89,16 +112,8 @@
             position: relative;
         }
 
-        .page-even { background: linear-gradient(to right, #ffffff 95%, #f1f1f1 100%); }
-        .page-odd { background: linear-gradient(to left, #ffffff 95%, #f1f1f1 100%); }
-
-        h1 { margin-top: 0; font-size: 1.8em; text-align: center; color: #d81b60;} /* Título menor */
-        .hard h1 { color: white; font-size: 2em; }
-        p { font-size: 1em; line-height: 1.5; text-align: justify; } /* Texto menor */
+        h1 { margin-top: 0; font-size: 1.8em; text-align: center; color: #d81b60;}
         
-        .contador { font-weight: bold; font-size: 1.2em; text-align: center; color: #e91e63; margin-top: 10px;}
-
-        /* --- PLAYER DE MÚSICA LOCAL --- */
         .meu-player {
             background-color: white;
             color: #333;
@@ -107,13 +122,11 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            width: 80%;
-            margin: 20px auto 0 auto;
+            width: 85%;
+            margin: 10px auto;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            border: 1px solid #f1f1f1;
         }
-        .meu-player-info { text-align: left; line-height: 1.2; }
-        .meu-player-titulo { font-weight: bold; font-size: 0.8em; color: #e91e63; }
-        .meu-player-artista { font-size: 0.7em; color: #888; }
         
         .btn-play {
             background-color: #e91e63;
@@ -122,86 +135,139 @@
             border-radius: 50%;
             width: 35px;
             height: 35px;
-            font-size: 1em;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             padding-left: 4px;
         }
-        
-        .dica { position: absolute; bottom: 10px; color: #888; font-size: 0.8em; width: 100%; text-align: center; pointer-events: none;}
 
-        /* RESPONSIVIDADE EXTREMA (Se a tela for muuuito pequena) */
+        .gif-container { width: 100%; text-align: center; margin-top: 5px; }
+        .gif-img { max-width: 60%; max-height: 100px; border-radius: 8px; }
+
+        .flip-clock-container { display: flex; justify-content: center; gap: 5px; margin-top: 5px; }
+        .flip-card { background: linear-gradient(to bottom, #333 50%, #222 50%); border-radius: 4px; padding: 4px 6px; min-width: 28px; border: 1px solid #111; display: flex; justify-content: center; align-items: center; }
+        .flip-number { color: #f1f1f1; font-family: 'Impact', sans-serif; font-size: 1.2em; }
+        .flip-label { color: #d81b60; font-size: 0.5em; font-weight: bold; text-transform: uppercase; text-align: center; }
+
+        .foto-anexo { max-width: 95%; max-height: 250px; display: block; margin: 5px auto 0 auto; border-radius: 8px; border: 4px solid white; object-fit: contain; }
+
         @media (max-width: 650px) {
-            #livro {
-                transform: scale(0.8); /* Encolhe o livro inteiro visualmente */
-                transform-origin: center center;
-            }
+            #livro { transform: scale(0.8); transform-origin: top center; }
+            #controles { margin-top: -30px; } 
         }
         @media (max-width: 500px) {
-            #livro { transform: scale(0.6); }
+            #livro { transform: scale(0.55); transform-origin: top center; }
+            #controles { margin-top: -120px; }
         }
     </style>
 </head>
 <body>
 
     <div id="telaInicio">
-        <h1>Tenho uma surpresa para você...</h1>
-        <p class="aviso-celular">📱 Para a melhor experiência,<br>vire seu celular de lado (na horizontal)!</p>
-        <button id="btnIniciar" onclick="iniciarLivro()">Abrir Presente 🎁</button>
+        <h1>UM PRESENTE DE ANIVERSARIO ESPECIAL PARA O AMORECO :)</h1>
+        <button id="btnIniciar" onclick="iniciarLivro()">🎁</button>
+        <p class="aviso-celular">Para melhor experiencia, vire o celular na horizontal</p>
     </div>
 
     <audio id="audioLocal" src="carry-on-my-wayward-son.mp3" loop></audio>
 
-    <div id="containerLivro">
+    <div id="containerPrincipal" style="display: none; flex-direction: column; align-items: center; width: 100%;">
+        
         <div id="livro">
-            <div class="hard">
-                <h1 style="margin-top: 40px;">A HISTÓRIA ATÉ AQUI</h1>
-                <p style="text-align: center; font-style: italic; font-size: 0.9em;">Arraste a ponta ❤️</p>
-                
+            <div class="page page-odd" style="padding: 25px;">
+                <h1 style="margin-top: 20px; color: #d81b60;">Nota do Autor 💌</h1>
+                <p style="font-size: 0.9em; text-align: left; margin-top: 20px; color: #333;">Sei que neste momento não estou do seu lado para lhe dar os parabéns pessoalmente, mas fiz essa lembrança para você, uma lembrança que daqui 50 anos vai estar aqui do mesmo jeito, espero que goste.</p>
+                <p style="text-align: right; font-weight: bold; margin-top: 20px; font-size: 0.9em; color: #d81b60;">- Mariposa ❤️</p>
+            </div>
+            
+            <div class="page page-even">
+                <h2 style="color: #d81b60; text-align: center; font-size: 1.3em;">Juntos há:</h2>
+                <div class="flip-clock-container">
+                    <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t-anos">00</span></div><div class="flip-label">Anos</div></div>
+                    <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t-meses">00</span></div><div class="flip-label">Meses</div></div>
+                    <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t-dias">00</span></div><div class="flip-label">Dias</div></div>
+                    <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t-horas">00</span></div><div class="flip-label">Horas</div></div>
+                    <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t-min">00</span></div><div class="flip-label">Min</div></div>
+                    <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t-seg">00</span></div><div class="flip-label">Seg</div></div>
+                </div>
+                <img src="Foto1.jpg" class="foto-anexo">
+            </div>
+
+            <div class="page page-odd" style="padding: 25px;">
+                <h1 style="font-size: 1.5em; margin-top: 10px;">A HISTÓRIA ATÉ AQUI</h1>
                 <div class="meu-player">
-                    <div class="meu-player-info">
-                        <div class="meu-player-titulo">Carry on Wayward Son</div>
-                        <div class="meu-player-artista">Kansas</div>
+                    <div style="text-align: left; line-height: 1.2;">
+                        <div style="font-weight: bold; font-size: 0.8em; color: #e91e63;">Carry on Wayward Son</div>
+                        <div style="font-size: 0.7em; color: #888;">Kansas</div>
                     </div>
                     <button class="btn-play" id="btnPlayLocal" onclick="toggleMusica()">▶️</button>
                 </div>
-            </div>
-            
-            <div class="hard">
-                <h2 style="color: white; text-align: center; margin-top: 150px;">Para a mulher da minha vida.</h2>
-            </div>
-
-            <div class="page page-odd">
-                <h1>Aquele Dia...</h1>
-                <p>Quando nos conhecemos, eu não imaginava a sorte que estava tendo.</p>
-                <p>O tempo voa, mas contei cada segundo!</p>
-                
-                <p style="text-align: center; margin-top: 20px;">Estamos juntos há:</p>
-                <div id="timer" class="contador">Calculando...</div>
+                <div class="gif-container">
+                    <img src="gif1.gif" alt="Surpresa" class="gif-img">
+                </div>
             </div>
 
-            <div class="page page-even">
-                <h1>Nossos Momentos</h1>
-                <p>Aqui você pode escrever mais sobre a história de vocês. Pode ser um parágrafo mais curto para caber bem na tela do celular.</p>
-            </div>
-
-            <div class="page page-odd">
-                <h1>A Nossa Viagem</h1>
-                <p>Lembra daquela viagem incrível? Foi ali que eu tive certeza de tudo.</p>
-            </div>
-
-            <div class="page page-even">
-                <h1>O Futuro</h1>
-                <p>A história até aqui foi incrível, mas mal posso esperar para escrever os próximos capítulos com você.</p>
-            </div>
-
-            <div class="hard">
-                <h1 style="margin-top: 150px;">Continua...</h1>
-            </div>
-            
-            <div class="hard">
-                <p style="text-align: center; margin-top: 180px; color: white;">Feito com amor, por mim.</p>
-            </div>
+            <div class="page"><h1>Aquele Dia...</h1><p>História aqui...</p></div>
+            <div class="page"><h1>A Nossa Viagem</h1><p>História aqui...</p></div>
+            <div class="page"><h1>O Futuro</h1><p>História aqui...</p></div>
+            <div class="page"><h1 style="margin-top: 150px;">Continua...</h1></div>
+            <div class="hard"><p style="text-align: center; margin-top: 180px; color: white;">Feito com amor ❤️</p></div>
         </div>
+
+        <div id="controles" style="margin-top: 15px; display: flex; gap: 20px;">
+            <button style="padding: 10px 20px; border-radius: 20px; border: 2px solid #e91e63; background: white; color: #e91e63; font-weight: bold;" onclick="$('#livro').turn('previous')">⬅️ Voltar</button>
+            <button style="padding: 10px 20px; border-radius: 20px; border: 2px solid #e91e63; background: white; color: #e91e63; font-weight: bold;" onclick="$('#livro').turn('next')">Avançar ➡️</button>
+        </div>
+    </div>
+
+    <script>
+        function iniciarLivro() {
+            setTimeout(() => {
+                document.getElementById('telaInicio').style.display = 'none';
+                document.getElementById('containerPrincipal').style.display = 'flex';
+                $('#livro').turn({ width: 600, height: 400, autoCenter: true, gradients: true, duration: 1000 });
+            }, 300);
+        }
+
+        const audio = document.getElementById('audioLocal');
+        const btnPlay = document.getElementById('btnPlayLocal');
+
+        function toggleMusica() {
+            if (audio.paused) {
+                audio.play();
+                btnPlay.innerText = '⏸️';
+            } else {
+                audio.pause();
+                btnPlay.innerText = '▶️';
+            }
+        }
+
+        const dataInicio = new Date(2022, 11, 9, 20, 0, 0); 
+        function atualizarContador() {
+            const agora = new Date();
+            let anos = agora.getFullYear() - dataInicio.getFullYear();
+            let meses = agora.getMonth() - dataInicio.getMonth();
+            let dias = agora.getDate() - dataInicio.getDate();
+            let horas = agora.getHours() - dataInicio.getHours();
+            let minutos = agora.getMinutes() - dataInicio.getMinutes();
+            let segundos = agora.getSeconds() - dataInicio.getSeconds();
+
+            if (segundos < 0) { segundos += 60; minutos--; }
+            if (minutos < 0) { minutos += 60; horas--; }
+            if (horas < 0) { horas += 24; dias--; }
+            if (dias < 0) { dias += new Date(agora.getFullYear(), agora.getMonth(), 0).getDate(); meses--; }
+            if (meses < 0) { meses += 12; anos--; }
+
+            document.getElementById("t-anos").innerText = anos < 10 ? '0'+anos : anos;
+            document.getElementById("t-meses").innerText = meses < 10 ? '0'+meses : meses;
+            document.getElementById("t-dias").innerText = dias < 10 ? '0'+dias : dias;
+            document.getElementById("t-horas").innerText = horas < 10 ? '0'+horas : horas;
+            document.getElementById("t-min").innerText = minutos < 10 ? '0'+minutos : minutos;
+            document.getElementById("t-seg").innerText = segundos < 10 ? '0'+segundos : segundos;
+        }
+        setInterval(atualizarContador, 1000);
+        atualizarContador();
+    </script>
+</body>
+</html>
