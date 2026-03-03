@@ -6,6 +6,7 @@
     <title>Para Você ❤️</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
     <style>
         body {
@@ -20,14 +21,14 @@
             overflow: hidden;
         }
 
-        /* --- TELA DE INÍCIO (Lilás e Animada) --- */
+        /* --- TELA DE INÍCIO --- */
         #telaInicio {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #D8BFD8; /* Cor Lilás */
+            background-color: #D8BFD8;
             color: white;
             display: flex;
             flex-direction: column;
@@ -38,14 +39,6 @@
             padding: 20px;
         }
 
-        #telaInicio h1 {
-            font-size: 1.8em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-            max-width: 80%;
-            margin-bottom: 10px;
-        }
-
-        /* Botão do Presente Pulsante */
         #btnIniciar {
             background: white;
             border: none;
@@ -59,215 +52,427 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            transition: all 0.2s ease;
-            animation: pulse 1.5s infinite ease-in-out;
+            animation: pulse-btn 1.5s infinite ease-in-out;
         }
 
-        /* Efeito de Brilho ao Clicar */
-        #btnIniciar:active {
-            box-shadow: 0 0 60px 30px rgba(255, 255, 255, 0.9);
-            transform: scale(1.2);
-        }
-
-        @keyframes pulse {
+        @keyframes pulse-btn {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
 
-        /* Texto de Aviso Atualizado */
-        .aviso-celular {
-            font-size: 0.9em;
-            color: #ffffff;
-            margin-top: 25px;
-            font-style: italic;
-            opacity: 0.9;
-        }
-
-        /* --- LIVRO --- */
+        /* --- ESTRUTURA DO LIVRO --- */
         #livro {
             width: 600px;
             height: 400px;
             box-shadow: 0 0 20px rgba(0,0,0,0.2);
-            position: relative;
+            margin: 0 auto;
         }
 
-        #livro .page {
+        #livro .page, #livro .hard {
             background-color: white;
-            color: #333;
-            padding: 10px;
             box-sizing: border-box;
             box-shadow: inset 0 0 30px rgba(0,0,0,0.05);
             border: 1px solid #ddd;
+        }
+
+        .page-content {
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            position: relative;
+            color: #333;
         }
 
         #livro .hard {
             background-color: #e91e63;
             color: white;
-            text-align: center;
             border-radius: 5px;
-            position: relative;
+            border: none;
         }
 
-        h1 { margin-top: 0; font-size: 1.8em; text-align: center; color: #d81b60;}
-        
+        /* --- NUMERAÇÃO DAS PÁGINAS --- */
+        .page-number {
+            position: absolute;
+            bottom: 15px;
+            font-size: 0.85em;
+            color: #888;
+            font-weight: bold;
+            z-index: 10;
+        }
+        .even .page-number { left: 15px; right: auto; } 
+        .odd .page-number { right: 15px; left: auto; }  
+
+        h1 { margin-top: 0; font-size: 1.6em; text-align: center; color: #d81b60;}
+        p { font-size: 0.95em; line-height: 1.4; text-align: justify; }
+
+        /* --- ESTER EGG SPAN --- */
+        .easter-egg { cursor: pointer; display: inline-block; }
+
+        /* --- ANIMAÇÕES DE TEXTO --- */
+        .futuro-msg {
+            font-size: 1.8em;
+            font-weight: bold;
+            text-align: center;
+            color: #8A2BE2;
+            animation: pulse-purple 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-purple {
+            0% { transform: scale(1); color: #8A2BE2; }
+            50% { transform: scale(1.08); color: #9932CC; text-shadow: 0 0 15px rgba(138, 43, 226, 0.4); }
+            100% { transform: scale(1); color: #8A2BE2; }
+        }
+
+        .pergunta-msg {
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+            color: #d81b60;
+        }
+
+        .fim-livro {
+            font-size: 1.1em;
+            letter-spacing: 4px;
+            font-weight: bold;
+            color: #fff;
+            animation: brilho-eterno 3s infinite alternate ease-in-out;
+            margin: 0;
+        }
+
+        @keyframes brilho-eterno {
+            0% { opacity: 0.7; text-shadow: 0 0 5px rgba(255,255,255,0.2); }
+            100% { opacity: 1; text-shadow: 0 0 15px rgba(255,255,255,0.9), 0 0 25px #ffb74d; }
+        }
+
+        /* --- PLAYER DE MÚSICA --- */
         .meu-player {
             background-color: white;
             color: #333;
             border-radius: 30px;
-            padding: 8px 15px;
+            padding: 6px 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             width: 85%;
-            margin: 10px auto;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            margin: 8px auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             border: 1px solid #f1f1f1;
         }
         
         .btn-play {
-            background-color: #e91e63;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 35px;
-            height: 35px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding-left: 4px;
+            background-color: #e91e63; color: white; border: none; border-radius: 50%;
+            width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; padding-left: 3px;
         }
 
-        .gif-container { width: 100%; text-align: center; margin-top: 5px; }
-        .gif-img { max-width: 60%; max-height: 100px; border-radius: 8px; }
+        .gif-img { max-width: 60%; max-height: 100px; border-radius: 8px; margin: 5px auto; display: block;}
 
-        .flip-clock-container { display: flex; justify-content: center; gap: 5px; margin-top: 5px; }
-        .flip-card { background: linear-gradient(to bottom, #333 50%, #222 50%); border-radius: 4px; padding: 4px 6px; min-width: 28px; border: 1px solid #111; display: flex; justify-content: center; align-items: center; }
-        .flip-number { color: #f1f1f1; font-family: 'Impact', sans-serif; font-size: 1.2em; }
-        .flip-label { color: #d81b60; font-size: 0.5em; font-weight: bold; text-transform: uppercase; text-align: center; }
+        /* --- CONTADORES --- */
+        .flip-clock-container { display: flex; justify-content: center; gap: 4px; margin-top: 5px; }
+        .flip-block { display: flex; flex-direction: column; align-items: center; }
+        .flip-card { background: linear-gradient(to bottom, #333 50%, #222 50%); border-radius: 4px; padding: 3px 5px; min-width: 26px; border: 1px solid #111; display: flex; justify-content: center; align-items: center; }
+        .flip-number { color: #f1f1f1; font-family: 'Impact', sans-serif; font-size: 1.1em; }
+        .flip-label { color: #d81b60; font-size: 0.5em; font-weight: bold; text-transform: uppercase; text-align: center; margin-top: 2px; }
 
-        .foto-anexo { max-width: 95%; max-height: 250px; display: block; margin: 5px auto 0 auto; border-radius: 8px; border: 4px solid white; object-fit: contain; }
+        /* --- IMAGENS --- */
+        .foto-anexo { max-width: 90%; max-height: 220px; display: block; margin: 5px auto 0 auto; border-radius: 8px; border: 4px solid white; object-fit: contain; }
+        .img-figurinha { max-height: 180px; max-width: 70%; display: block; margin: 0 auto; border-radius: 10px; }
+        .print-img { max-width: 95%; max-height: 340px; border-radius: 8px; border: 5px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin: auto; display: block; }
 
-        @media (max-width: 650px) {
-            #livro { transform: scale(0.8); transform-origin: top center; }
-            #controles { margin-top: -30px; } 
+        /* --- COLAGEM P11 --- */
+        .collage-container { position: relative; width: 100%; height: 100%; }
+        .polaroid { position: absolute; background: white; padding: 5px 5px 15px 5px; border: 1px solid #ddd; box-shadow: 2px 4px 10px rgba(0,0,0,0.2); width: 90px; height: 110px; object-fit: cover; }
+        .foto1 { top: 10px; left: 10px; transform: rotate(-10deg); z-index: 1; }
+        .foto2 { top: 25px; left: 125px; transform: rotate(5deg); z-index: 3; }
+        .foto3 { top: 15px; left: 240px; transform: rotate(-5deg); z-index: 2; }
+        .foto4 { top: 135px; left: 35px; transform: rotate(12deg); z-index: 5; }
+        .foto5 { top: 150px; left: 150px; transform: rotate(-8deg); z-index: 4; }
+        .foto6 { top: 225px; left: 20px; transform: rotate(-15deg); z-index: 6; }
+        .foto7 { top: 235px; left: 230px; transform: rotate(8deg); z-index: 7; }
+
+        /* --- HQ P16 --- */
+        .hq-container {
+            display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 105px); gap: 0px; 
+            width: 100%; height: auto; margin-top: 5px; border-radius: 8px; overflow: hidden; border: 3px solid #111; box-shadow: 4px 4px 0px #111; 
         }
-        @media (max-width: 500px) {
-            #livro { transform: scale(0.55); transform-origin: top center; }
-            #controles { margin-top: -120px; }
+        .hq-painel { background: #fff; border: 2px solid #111; overflow: hidden; position: relative; box-sizing: border-box; }
+        .hq-painel img { width: 100%; height: 100%; object-fit: cover; display: block; cursor: pointer; transition: transform 0.2s ease; }
+        .hq-painel img:hover { transform: scale(1.05); z-index: 2; }
+        #pane-ia1 { grid-area: 1 / 1 / 2 / 3; } #pane-ia2 { grid-area: 1 / 3 / 3 / 4; } #pane-ia3 { grid-area: 2 / 1 / 3 / 2; } #pane-ia4 { grid-area: 2 / 2 / 3 / 3; } #pane-ia5 { grid-area: 3 / 1 / 4 / 4; } 
+
+        /* --- LIGHTBOX --- */
+        #lightbox {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); 
+            z-index: 100000; justify-content: center; align-items: center; cursor: pointer; 
         }
+        #lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; border: 4px solid white; box-shadow: 0 0 20px rgba(0,0,0,0.6); cursor: default; }
+
+        @media (max-width: 650px) { #livro { transform: scale(0.8); transform-origin: top center; } }
+        @media (max-width: 500px) { #livro { transform: scale(0.55); transform-origin: top center; } .polaroid { width: 75px; height: 95px; } }
     </style>
 </head>
 <body>
 
     <div id="telaInicio">
-        <h1>UM PRESENTE DE ANIVERSARIO ESPECIAL PARA O AMORECO :)</h1>
+        <h1>UM PRESENTE DE ANIVERSÁRIO ESPECIAL PARA O AMORECO :)</h1>
         <button id="btnIniciar" onclick="iniciarLivro()">🎁</button>
-        <p class="aviso-celular">Para melhor experiencia, vire o celular na horizontal</p>
+        <p style="margin-top: 20px; font-style: italic; max-width: 80%;">Para melhor experiência, vire o celular na horizontal e coloque no "Site para computador".</p>
     </div>
 
-    <audio id="audioLocal" src="carry-on-my-wayward-son.mp3" loop></audio>
+    <div id="lightbox">
+        <img id="lightbox-img" src="" alt="Imagem Expandida">
+    </div>
+
+    <audio id="audioKansas" src="carry-on-my-wayward-son.mp3" loop></audio>
+    <audio id="audioImprevisto" src="Imprevisto.mp3" loop></audio>
+    <audio id="audioPenedo" src="Penedo-MandaÁudio.mp3" loop></audio>
+    <audio id="audioRubi" src="RUBI.mp3" loop></audio>
 
     <div id="containerPrincipal" style="display: none; flex-direction: column; align-items: center; width: 100%;">
-        
         <div id="livro">
-            <div class="page page-odd" style="padding: 25px;">
-                <h1 style="margin-top: 20px; color: #d81b60;">Nota do Autor 💌</h1>
-                <p style="font-size: 0.9em; text-align: left; margin-top: 20px; color: #333;">Sei que neste momento não estou do seu lado para lhe dar os parabéns pessoalmente, mas fiz essa lembrança para você, uma lembrança que daqui 50 anos vai estar aqui do mesmo jeito, espero que goste.</p>
-                <p style="text-align: right; font-weight: bold; margin-top: 20px; font-size: 0.9em; color: #d81b60;">- Mariposa ❤️</p>
-            </div>
+            <div class="hard odd"><div class="page-content"><h1>Nota do Autor 💌</h1><p>Sei que neste momento não estou do seu lado para lhe dar os parabéns pessoalmente, mas fiz essa lembrança para você, uma lembrança que daqui 50 anos vai estar aqui do mesmo jeito, espero que goste.</p><p style="text-align: right; font-weight: bold; color: #d81b60;">- Mariposa ❤️</p><div class="page-number">1</div></div></div>
             
-            <div class="page page-even">
-                <h2 style="color: #d81b60; text-align: center; font-size: 1.3em;">Juntos há:</h2>
-                <div class="flip-clock-container">
-                    <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t-anos">00</span></div><div class="flip-label">Anos</div></div>
-                    <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t-meses">00</span></div><div class="flip-label">Meses</div></div>
-                    <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t-dias">00</span></div><div class="flip-label">Dias</div></div>
-                    <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t-horas">00</span></div><div class="flip-label">Horas</div></div>
-                    <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t-min">00</span></div><div class="flip-label">Min</div></div>
-                    <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t-seg">00</span></div><div class="flip-label">Seg</div></div>
-                </div>
-                <img src="Foto1.jpg" class="foto-anexo">
-            </div>
+            <div class="page"><div class="page-content"><h2 style="color: #d81b60; text-align: center; font-size: 1.1em;">Juntos pela primeira vez há:</h2><div class="flip-clock-container">
+                <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t1-anos">00</span></div><div class="flip-label">Anos</div></div>
+                <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t1-meses">00</span></div><div class="flip-label">Meses</div></div>
+                <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t1-dias">00</span></div><div class="flip-label">Dias</div></div>
+                <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t1-horas">00</span></div><div class="flip-label">Horas</div></div>
+                <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t1-min">00</span></div><div class="flip-label">Min</div></div>
+                <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t1-seg">00</span></div><div class="flip-label">Seg</div></div>
+            </div><img src="Foto1.jpg" class="foto-anexo"><div class="page-number">2</div></div></div>
 
-            <div class="page page-odd" style="padding: 25px;">
-                <h1 style="font-size: 1.5em; margin-top: 10px;">A HISTÓRIA ATÉ AQUI</h1>
-                <div class="meu-player">
-                    <div style="text-align: left; line-height: 1.2;">
-                        <div style="font-weight: bold; font-size: 0.8em; color: #e91e63;">Carry on Wayward Son</div>
-                        <div style="font-size: 0.7em; color: #888;">Kansas</div>
+            <div class="page"><div class="page-content"><h1>A HISTÓRIA ATÉ AQUI</h1><div class="meu-player"><div style="text-align: left; line-height: 1.1;"><div style="font-weight: bold; font-size: 0.7em; color: #e91e63;">Carry on Wayward Son</div><div style="font-size: 0.6em; color: #888;">Kansas</div></div><button class="btn-play" onclick="toggleMusic('kansas')">▶️</button></div><img src="gif1.gif" class="gif-img"><div class="page-number">3</div></div></div>
+
+            <div class="page"><div class="page-content"><h1>Naquele Dia...</h1><p>Na primeira vez que te vi, meu mundo parou. Eu já te conhecia, mas aquele dia teve um brilho diferente. Foi o nosso primeiro beijo, a descoberta do meu primeiro amor recíproco e o momento que mudaria minha vida para sempre.</p><div class="meu-player"><div style="text-align: left; line-height: 1.1;"><div style="font-weight: bold; font-size: 0.7em; color: #e91e63;">Imprevisto</div><div style="font-size: 0.6em; color: #888;">Yago Oproprio</div></div><button class="btn-play" onclick="toggleMusic('imprevisto')">▶️</button></div><div class="page-number">4</div></div></div>
+
+            <div class="page"><div class="page-content"><img src="Foto2.jpg" style="max-height: 330px; max-width: 95%; margin: auto; display: block; border: 8px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"><div class="page-number">5</div></div></div>
+
+            <div class="page"><div class="page-content"><h1>Infelizmente...</h1><p>Houve um tempo em que o destino não pareceu estar ao nosso favor. As adversidades do mundo e erros imaturos acabaram nos separando. Foi um capítulo doloroso, mas o meu amor permaneceu guardado.</p><div class="meu-player"><div style="text-align: left; line-height: 1.1;"><div style="font-weight: bold; font-size: 0.7em; color: #e91e63;">Manda Áudio</div><div style="font-size: 0.6em; color: #888;">Penedo</div></div><button class="btn-play" onclick="toggleMusic('penedo')">▶️</button></div><div class="page-number">6</div></div></div>
+
+            <div class="page"><div class="page-content"><img src="figurinha.png" class="img-figurinha"><p style="text-align: center; font-weight: bold; margin-top: 15px; color: #d81b60;">Mas o que parecia um fim era apenas uma reticência. O fio que nos ligava era forte demais para se romper.</p><div class="page-number">7</div></div></div>
+
+            <div class="page"><div class="page-content"><p style="margin-top: 5px;">O destino nos uniu novamente. No dia 11 de Junho, você me mandou a mensagem que mudaria tudo. Desde aquele instante, voltamos a caminhar juntos.</p><h2 style="color: #d81b60; text-align: center; font-size: 1.0em; margin-top: 2px;">Recomeçamos há:</h2><div class="flip-clock-container">
+                <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t2-anos">00</span></div><div class="flip-label">Anos</div></div>
+                <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t2-meses">00</span></div><div class="flip-label">Meses</div></div>
+                <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t2-dias">00</span></div><div class="flip-label">Dias</div></div>
+                <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t2-horas">00</span></div><div class="flip-label">Horas</div></div>
+                <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t2-min">00</span></div><div class="flip-label">Min</div></div>
+                <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t2-seg">00</span></div><div class="flip-label">Seg</div></div>
+            </div><div class="meu-player" style="margin-top: 5px;"><div style="text-align: left; line-height: 1.1;"><div style="font-weight: bold; font-size: 0.7em; color: #e91e63;">RUBI</div><div style="font-size: 0.6em; color: #888;">Kawe</div></div><button class="btn-play" onclick="toggleMusic('rubi')">▶️</button></div><div class="page-number">8</div></div></div>
+
+            <div class="page"><div class="page-content"><img src="print.jpeg" class="print-img"><div class="page-number">9</div></div></div>
+
+            <div class="page"><div class="page-content"><h1>E continuamos juntos...</h1><p style="margin-top: 10px;">Vivendo o "nós" cada vez mais intensamente. Através de brigas bobas, viagens (às vezes kkk), palhaçadas e, acima de tudo, com muito amor.</p><div class="page-number">10</div></div></div>
+
+            <div class="page"><div class="page-content"><div class="collage-container">
+                <img src="Foto3.jpg" class="polaroid foto1">
+                <img src="Foto4.jpg" class="polaroid foto2">
+                <img src="Foto5.jpg" class="polaroid foto3">
+                <img src="Foto6.jpg" class="polaroid foto4">
+                <img src="Foto7.jpg" class="polaroid foto5">
+                <img src="Foto8.jpg" class="polaroid foto6">
+                <img src="Foto9.jpg" class="polaroid foto7">
+            </div><div class="page-number">11</div></div></div>
+
+            <div class="page"><div class="page-content"><h1 style="font-size: 2.5em; color: #d81b60;">Continua...</h1><div class="page-number">12</div></div></div>
+
+            <div class="page">
+                <div class="page-content">
+                    <div class="futuro-msg">
+                        <span class="easter-egg" onclick="abrirEasterEgg()">Quer</span> um vislumbre do futuro?
                     </div>
-                    <button class="btn-play" id="btnPlayLocal" onclick="toggleMusica()">▶️</button>
-                </div>
-                <div class="gif-container">
-                    <img src="gif1.gif" alt="Surpresa" class="gif-img">
+                    <div class="page-number">13</div>
                 </div>
             </div>
 
-            <div class="page"><h1>Aquele Dia...</h1><p>História aqui...</p></div>
-            <div class="page"><h1>A Nossa Viagem</h1><p>História aqui...</p></div>
-            <div class="page"><h1>O Futuro</h1><p>História aqui...</p></div>
-            <div class="page"><h1 style="margin-top: 150px;">Continua...</h1></div>
-            <div class="hard"><p style="text-align: center; margin-top: 180px; color: white;">Feito com amor ❤️</p></div>
-        </div>
+            <div class="page"><div class="page-content"><div class="pergunta-msg">Tem certeza?</div><div class="page-number">14</div></div></div>
 
+            <div class="page"><div class="page-content"><div class="pergunta-msg" style="color: #8A2BE2;">Tabom, mas é segredo 🤫</div><div class="page-number">15</div></div></div>
+
+            <div class="page">
+                <div class="page-content" style="padding: 10px;">
+                    <h1 style="font-size: 1.3em; margin-bottom: 5px; margin-top: 5px;">Nosso Futuro...</h1>
+                    <p style="font-size: 0.7em; text-align: center; color: #888; margin-top: -5px; margin-bottom: 8px;">(Clique nas imagens para ampliar)</p>
+                    <div class="hq-container">
+                        <div class="hq-painel" id="pane-ia1"><img src="IA1.png" alt="Painel 1"></div>
+                        <div class="hq-painel" id="pane-ia2"><img src="IA2.png" alt="Painel 2"></div>
+                        <div class="hq-painel" id="pane-ia3"><img src="IA3.png" alt="Painel 3"></div>
+                        <div class="hq-painel" id="pane-ia4"><img src="IA4.png" alt="Painel 4"></div>
+                        <div class="hq-painel" id="pane-ia5"><img src="IA5.png" alt="Painel 5"></div>
+                    </div>
+                    <div class="page-number">16</div>
+                </div>
+            </div>
+
+            <div class="page">
+                <div class="page-content" style="text-align: center; padding: 10px 15px;">
+                    <p style="font-size: 0.85em; text-align: justify; line-height: 1.4; margin-bottom: 5px; margin-top: 0;">
+                        Meu amor, sei que não estou ai nesse momento, mas através dessa lembrança que fiz para você queria demonstrar um pouco do meu carinho, as coisas continuam dificeis ai eu sei, mas peço que mantenha a cabeça erguida para realizar nosso sonho, nesse exato momento faltam apenas:
+                    </p>
+                    <div class="flip-clock-container" style="margin: 10px 0; transform: scale(0.9);">
+                        <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t3-anos">00</span></div><div class="flip-label">Anos</div></div>
+                        <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t3-meses">00</span></div><div class="flip-label">Meses</div></div>
+                        <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t3-dias">00</span></div><div class="flip-label">Dias</div></div>
+                        <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t3-horas">00</span></div><div class="flip-label">Horas</div></div>
+                        <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t3-min">00</span></div><div class="flip-label">Min</div></div>
+                        <div class="flip-block"><div class="flip-card"><span class="flip-number" id="t3-seg">00</span></div><div class="flip-label">Seg</div></div>
+                    </div>
+                    <p style="font-size: 0.9em; text-align: center; font-weight: bold; color: #8A2BE2; margin-top: 5px;">
+                        Quando chegar a 0 esse marcador vamos realizar nosso sonho.
+                    </p>
+                    <div class="page-number">17</div>
+                </div>
+            </div>
+
+            <div class="hard even">
+                <div class="page-content" style="text-align: center; align-items: center;">
+                    <h1 style="font-size: 1.6em; color: white; text-shadow: 2px 2px 5px rgba(0,0,0,0.3); margin-bottom: 10px; margin-top: 0; line-height: 1.2;">
+                        FELIZ ANIVERSÁRIO AMORECO 🎂🎉
+                    </h1>
+                    <span style="color: rgba(255,255,255,0.6); font-size: 1.5em; margin: 15px 0;">❦</span>
+                    <p style="font-size: 1.2em; color: white; font-weight: bold; margin-bottom: 20px;">NOSSA HISTÓRIA É ETERNA</p>
+                    <div style="width: 50px; height: 2px; background-color: white; margin-bottom: 25px; opacity: 0.5;"></div>
+                    <p class="fim-livro">E O FIM NÃO EXISTE</p>
+                    <div class="page-number" style="color: white;">18</div>
+                </div>
+            </div>
+        </div>
+        
         <div id="controles" style="margin-top: 15px; display: flex; gap: 20px;">
-            <button style="padding: 10px 20px; border-radius: 20px; border: 2px solid #e91e63; background: white; color: #e91e63; font-weight: bold;" onclick="$('#livro').turn('previous')">⬅️ Voltar</button>
-            <button style="padding: 10px 20px; border-radius: 20px; border: 2px solid #e91e63; background: white; color: #e91e63; font-weight: bold;" onclick="$('#livro').turn('next')">Avançar ➡️</button>
+            <button onclick="$('#livro').turn('previous')" style="padding: 10px 20px; border-radius: 20px; border: 2px solid #e91e63; background: white; color: #e91e63; font-weight: bold; cursor: pointer;">⬅️ Voltar</button>
+            <button onclick="$('#livro').turn('next')" style="padding: 10px 20px; border-radius: 20px; border: 2px solid #e91e63; background: white; color: #e91e63; font-weight: bold; cursor: pointer;">Avançar ➡️</button>
         </div>
     </div>
 
     <script>
+        const aKansas = document.getElementById('audioKansas');
+        const aImprevisto = document.getElementById('audioImprevisto');
+        const aPenedo = document.getElementById('audioPenedo');
+        const aRubi = document.getElementById('audioRubi');
+
         function iniciarLivro() {
             setTimeout(() => {
                 document.getElementById('telaInicio').style.display = 'none';
                 document.getElementById('containerPrincipal').style.display = 'flex';
-                $('#livro').turn({ width: 600, height: 400, autoCenter: true, gradients: true, duration: 1000 });
+                const livro = $('#livro');
+                livro.turn({ width: 600, height: 400, autoCenter: true, gradients: true, duration: 1000 });
+                
+                livro.bind("turned", function(event, page) {
+                    aKansas.pause(); aImprevisto.pause(); aPenedo.pause(); aRubi.pause();
+                    if (page <= 3) aKansas.play();
+                    else if (page == 4 || page == 5) aImprevisto.play();
+                    else if (page == 6 || page == 7) aPenedo.play();
+                    else if (page >= 8) aRubi.play();
+
+                    // EXPLOSÃO DE CONFETE NA ÚLTIMA PÁGINA
+                    if (page === 18) {
+                        dispararConfete();
+                    }
+                });
             }, 300);
         }
 
-        const audio = document.getElementById('audioLocal');
-        const btnPlay = document.getElementById('btnPlayLocal');
+        function dispararConfete() {
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100001 };
 
-        function toggleMusica() {
-            if (audio.paused) {
-                audio.play();
-                btnPlay.innerText = '⏸️';
-            } else {
-                audio.pause();
-                btnPlay.innerText = '▶️';
+            function randomInRange(min, max) {
+              return Math.random() * (max - min) + min;
             }
+
+            var interval = setInterval(function() {
+              var timeLeft = animationEnd - Date.now();
+              if (timeLeft <= 0) return clearInterval(interval);
+              var particleCount = 50 * (timeLeft / duration);
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
         }
 
-        const dataInicio = new Date(2022, 11, 9, 20, 0, 0); 
-        function atualizarContador() {
+        function toggleMusic(type) {
+            const aud = document.getElementById('audio' + type.charAt(0).toUpperCase() + type.slice(1));
+            if (aud.paused) { aKansas.pause(); aImprevisto.pause(); aPenedo.pause(); aRubi.pause(); aud.play(); } else aud.pause();
+        }
+
+        $(document).on('click', '.hq-painel img', function() {
+            const imgSrc = $(this).attr('src');
+            $('#lightbox-img').attr('src', imgSrc);
+            $('#lightbox').css('display', 'flex').hide().fadeIn(300); 
+        });
+
+        function abrirEasterEgg() {
+            $('#lightbox-img').attr('src', 'IA6.png');
+            $('#lightbox').css('display', 'flex').hide().fadeIn(300);
+        }
+
+        $(document).on('click', '#lightbox', function(event) {
+            if (event.target.id === 'lightbox') {
+                $(this).fadeOut(300);
+            }
+        });
+
+        const d1 = new Date(2022, 11, 9, 20, 0, 0); 
+        const d2 = new Date(2024, 5, 11, 3, 56, 0); 
+        const d3 = new Date(2027, 2, 4, 0, 0, 0);   
+
+        function calcProgressive(start, ids) {
             const agora = new Date();
-            let anos = agora.getFullYear() - dataInicio.getFullYear();
-            let meses = agora.getMonth() - dataInicio.getMonth();
-            let dias = agora.getDate() - dataInicio.getDate();
-            let horas = agora.getHours() - dataInicio.getHours();
-            let minutos = agora.getMinutes() - dataInicio.getMinutes();
-            let segundos = agora.getSeconds() - dataInicio.getSeconds();
-
-            if (segundos < 0) { segundos += 60; minutos--; }
-            if (minutos < 0) { minutos += 60; horas--; }
-            if (horas < 0) { horas += 24; dias--; }
-            if (dias < 0) { dias += new Date(agora.getFullYear(), agora.getMonth(), 0).getDate(); meses--; }
-            if (meses < 0) { meses += 12; anos--; }
-
-            document.getElementById("t-anos").innerText = anos < 10 ? '0'+anos : anos;
-            document.getElementById("t-meses").innerText = meses < 10 ? '0'+meses : meses;
-            document.getElementById("t-dias").innerText = dias < 10 ? '0'+dias : dias;
-            document.getElementById("t-horas").innerText = horas < 10 ? '0'+horas : horas;
-            document.getElementById("t-min").innerText = minutos < 10 ? '0'+minutos : minutos;
-            document.getElementById("t-seg").innerText = segundos < 10 ? '0'+segundos : segundos;
+            let y = agora.getFullYear() - start.getFullYear();
+            let m = agora.getMonth() - start.getMonth();
+            let d = agora.getDate() - start.getDate();
+            let h = agora.getHours() - start.getHours();
+            let min = agora.getMinutes() - start.getMinutes();
+            let s = agora.getSeconds() - start.getSeconds();
+            if (s < 0) { s += 60; min--; }
+            if (min < 0) { min += 60; h--; }
+            if (h < 0) { h += 24; d--; }
+            if (d < 0) { d += new Date(agora.getFullYear(), agora.getMonth(), 0).getDate(); m--; }
+            if (m < 0) { m += 12; y--; }
+            const vals = [y, m, d, h, min, s];
+            ids.forEach((id, i) => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = vals[i] < 10 ? '0' + vals[i] : vals[i];
+            });
         }
-        setInterval(atualizarContador, 1000);
-        atualizarContador();
+
+        function calcCountdownFull(target, ids) {
+            const agora = new Date();
+            if (target.getTime() <= agora.getTime()) {
+                ids.forEach(id => { const el = document.getElementById(id); if (el) el.innerText = '00'; });
+                return;
+            }
+            let y = target.getFullYear() - agora.getFullYear();
+            let m = target.getMonth() - agora.getMonth();
+            let d = target.getDate() - agora.getDate();
+            let h = target.getHours() - agora.getHours();
+            let min = target.getMinutes() - agora.getMinutes();
+            let s = target.getSeconds() - agora.getSeconds();
+            if (s < 0) { s += 60; min--; }
+            if (min < 0) { min += 60; h--; }
+            if (h < 0) { h += 24; d--; }
+            if (d < 0) { 
+                let prevMonthDays = new Date(target.getFullYear(), target.getMonth(), 0).getDate();
+                d += prevMonthDays; m--; 
+            }
+            if (m < 0) { m += 12; y--; }
+            const vals = [y, m, d, h, min, s];
+            ids.forEach((id, i) => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = vals[i] < 10 ? '0' + vals[i] : vals[i];
+            });
+        }
+
+        setInterval(() => {
+            calcProgressive(d1, ['t1-anos','t1-meses','t1-dias','t1-horas','t1-min','t1-seg']);
+            calcProgressive(d2, ['t2-anos','t2-meses','t2-dias','t2-horas','t2-min','t2-seg']);
+            calcCountdownFull(d3, ['t3-anos','t3-meses','t3-dias','t3-horas','t3-min','t3-seg']);
+        }, 1000);
     </script>
 </body>
 </html>
